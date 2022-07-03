@@ -20,6 +20,16 @@ public class PlayerInputHandler : MonoBehaviour
         /// </summary>
         public Vector2 Value { get; private set; }
 
+        /// <summary>
+        /// X-axis of the vector Value.
+        /// </summary>
+        public float Horizontal => Value.x;
+
+        /// <summary>
+        /// Y-axis of the vector value.
+        /// </summary>
+        public float Vertical => Value.y;
+
         public Action<InputAction.CallbackContext> InputCallback => OnInputChanged;
 
         private void OnInputChanged(InputAction.CallbackContext context)

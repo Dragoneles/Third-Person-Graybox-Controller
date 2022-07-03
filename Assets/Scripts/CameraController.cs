@@ -23,9 +23,14 @@ public class CameraController : MonoBehaviour
 
     private PlayerInputHandler _input;
 
+    /// <summary>
+    /// The camera that is used by this behavior.
+    /// </summary>
+    public Camera Camera => _camera;
+
     private void Awake()
     {
-        _input = transform.root.GetComponentInChildren<PlayerInputHandler>();
+        _input = FindObjectOfType<PlayerInputHandler>();
     }
 
     private void OnValidate()
