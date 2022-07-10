@@ -1,5 +1,5 @@
 // Author:  Joseph Crump
-// Date:    06/03/22
+// Date:    07/03/22
 
 using System;
 using System.Collections;
@@ -38,6 +38,29 @@ public class PlayerInputHandler : MonoBehaviour
         }
     }
 
+    public class VirtualButton
+    {
+        /// <summary>
+        /// Current pressed state of the button.
+        /// </summary>
+        public bool IsDown { get; private set; }
+
+        /// <summary>
+        /// Event raised when the button is first pressed.
+        /// </summary>
+        public event Action Pressed;
+
+        public Action<InputAction.CallbackContext> InputCallback => OnInputUsed;
+
+        private void OnInputUsed(InputAction.CallbackContext context)
+        {
+            IsDown = context.ReadValueAsButton();
+
+            if (context.performed)
+                Pressed?.Invoke();
+        }
+    }
+
     private class CallbackInfo
     {
         public string Action;
@@ -48,6 +71,8 @@ public class PlayerInputHandler : MonoBehaviour
 
     private readonly VirtualAxis _move = new VirtualAxis();
     private readonly VirtualAxis _look = new VirtualAxis();
+    private readonly VirtualButton _jump = new VirtualButton();
+    private readonly VirtualButton _toggleMoveState = new VirtualButton();
 
     private readonly List<CallbackInfo> registeredCallbacks = new List<CallbackInfo>();
 
@@ -61,6 +86,16 @@ public class PlayerInputHandler : MonoBehaviour
     /// </summary>
     public VirtualAxis Look => _look;
 
+    /// <summary>
+    /// The input button used to jump.
+    /// </summary>
+    public VirtualButton Jump => _jump;
+
+    /// <summary>
+    /// The input used to toggle between default movement and flight mode.
+    /// </summary>
+    public VirtualButton ToggleMoveState => _toggleMoveState;
+
     private void Awake()
     {
         _input = GetComponent<PlayerInput>();
@@ -70,6 +105,8 @@ public class PlayerInputHandler : MonoBehaviour
     {
         RegisterCallback("Move", Move.InputCallback);
         RegisterCallback("Look", Look.InputCallback);
+        RegisterCallback("Jump", Jump.InputCallback);
+        RegisterCallback("ToggleMoveState", ToggleMoveState.InputCallback);
     }
 
     private void OnDisable()

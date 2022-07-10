@@ -1,5 +1,5 @@
 // Author:  Joseph Crump
-// Date:    06/03/22
+// Date:    07/03/22
 
 using System;
 using System.Collections;
@@ -12,33 +12,59 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class CharacterController : MonoBehaviour
 {
+    public enum MoveMode
+    {
+        Default,
+        Flight
+    }
+
     [Header("References")]
     [SerializeField]
     private PlayerInputHandler _input;
 
+    [SerializeField]
+    private Transform _cameraTarget;
+
     [Header("Settings")]
     [SerializeField]
+    [Tooltip("The initial move state for the controller.")]
+    private MoveMode _moveMode = MoveMode.Default;
+
+    [SerializeField]
     [Tooltip("How quickly the player moves in any direction.")]
-    private float speed = 5f;
+    private float _speed = 5f;
 
     [SerializeField]
     [Tooltip("Maximum pathing angle. Slopes steeper than this will prevent the player from moving up them.")]
-    private float maxClimbAngle = 30f;
+    private float _maxClimbAngle = 30f;
 
     [SerializeField]
-    [Range(0f, 1f)]
-    [Tooltip("Interpolant used to angle the character in the camera's direction.")]
-    private float turnInterpolant = 0.2f;
+    private float _minCameraPitch = -80f, _maxCameraPitch = 80f;
+
+    [SerializeField, Range(0f, 1f)]
+    private float _pitchInterpolant = 0.2f;
+
+    [SerializeField, Min(0f)]
+    private float _pitchSensitivity = 0.5f, _yawSensitivity = 0.8f;
+
+    [SerializeField]
+    private bool _invertYaw = false, _invertPitch = false;
+
+    private float _targetPitch = 0f;
+    private float TargetPitch
+    {
+        get => _targetPitch;
+        set
+        {
+            _targetPitch = Mathf.Clamp(value, _minCameraPitch, _maxCameraPitch);
+        }
+    }
 
     private Rigidbody _rigidbody;
-    private Camera _camera;
 
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody>();
-
-        var cameraController = FindObjectOfType<CameraController>();
-        _camera = cameraController.Camera;
     }
 
     private void OnValidate()
@@ -49,8 +75,32 @@ public class CharacterController : MonoBehaviour
 
     private void Update()
     {
-        LookTowardsCamera();
+        if (Application.isFocused == false)
+            return;
+
         Move();
+        Look();
+    }
+
+    private void OnEnable()
+    {
+        ShowMouseCursor(false);
+
+        _input.Jump.Pressed += Jump;
+        _input.ToggleMoveState.Pressed += ToggleMoveMode;
+    }
+
+    private void OnDisable()
+    {
+        ShowMouseCursor(true);
+
+        _input.Jump.Pressed -= Jump;
+        _input.ToggleMoveState.Pressed -= ToggleMoveMode;
+    }
+
+    private void OnApplicationFocus(bool focus)
+    {
+        ShowMouseCursor(!focus);
     }
 
     private void Move()
@@ -60,37 +110,37 @@ public class CharacterController : MonoBehaviour
 
         var direction = new Vector3(strafe, 0f, forward).normalized;
         direction = transform.TransformVector(direction);
-        _rigidbody.velocity = direction * speed;
+        _rigidbody.velocity = direction * _speed;
     }
 
-    private void LookTowardsCamera()
+    private void Look()
     {
-        Vector3 forward = GetPlanarForward();
-        Vector3 cameraForward = GetCameraPlanarDirection();
+        float yawDelta = _input.Look.Horizontal * _yawSensitivity;
+        yawDelta = (_invertYaw) ? -yawDelta : yawDelta;
+        transform.Rotate(0f, yawDelta, 0f);
 
-        transform.forward = Vector3.Slerp(forward, cameraForward, turnInterpolant);
+        float pitchDelta = _input.Look.Vertical * _pitchSensitivity;
+        pitchDelta = (_invertPitch) ? -pitchDelta : pitchDelta;
+
+        TargetPitch += pitchDelta;
+        var currentRotation = _cameraTarget.localRotation;
+        var newRotation = Quaternion.Euler(TargetPitch, currentRotation.y, currentRotation.z);
+        _cameraTarget.localRotation = Quaternion.Slerp(currentRotation, newRotation, _pitchInterpolant);
     }
 
-    private Vector3 GetCameraDirection()
+    private void Jump()
     {
-        return _camera.transform.forward;
+
     }
 
-    // Removes Y elevation from the camera direction
-    private Vector3 GetCameraPlanarDirection()
+    private void ToggleMoveMode()
     {
-        Vector3 direction = GetCameraDirection();
-        direction.y = 0f;
-        direction.Normalize();
-        return direction;
+
     }
 
-    // Removed Y elevation from player forward
-    private Vector3 GetPlanarForward()
+    private void ShowMouseCursor(bool value)
     {
-        Vector3 direction = transform.forward;
-        direction.y = 0f;
-        direction.Normalize();
-        return direction;
+        Cursor.visible = value;
+        Cursor.lockState = value ? CursorLockMode.None : CursorLockMode.Locked;
     }
 }
