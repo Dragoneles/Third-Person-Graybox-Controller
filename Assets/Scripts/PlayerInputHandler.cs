@@ -13,13 +13,23 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerInput))]
 public class PlayerInputHandler : MonoBehaviour
 {
-    public class VirtualAxis
+    public abstract class VirtualInputValue<TValue> where TValue : struct
     {
         /// <summary>
         /// Current input value of the axis.
         /// </summary>
-        public Vector2 Value { get; private set; }
+        public TValue Value { get; private set; }
 
+        public Action<InputAction.CallbackContext> InputCallback => OnInputChanged;
+
+        private void OnInputChanged(InputAction.CallbackContext context)
+        {
+            Value = context.ReadValue<TValue>();
+        }
+    }
+
+    public class VirtualVector : VirtualInputValue<Vector2>
+    {
         /// <summary>
         /// X-axis of the vector Value.
         /// </summary>
@@ -29,14 +39,9 @@ public class PlayerInputHandler : MonoBehaviour
         /// Y-axis of the vector value.
         /// </summary>
         public float Vertical => Value.y;
-
-        public Action<InputAction.CallbackContext> InputCallback => OnInputChanged;
-
-        private void OnInputChanged(InputAction.CallbackContext context)
-        {
-            Value = context.ReadValue<Vector2>();
-        }
     }
+
+    public class VirtualAxis : VirtualInputValue<float> { }
 
     public class VirtualButton
     {
@@ -69,8 +74,9 @@ public class PlayerInputHandler : MonoBehaviour
 
     private PlayerInput _input;
 
-    private readonly VirtualAxis _move = new VirtualAxis();
-    private readonly VirtualAxis _look = new VirtualAxis();
+    private readonly VirtualVector _move = new VirtualVector();
+    private readonly VirtualVector _look = new VirtualVector();
+    private readonly VirtualAxis _altitude = new VirtualAxis();
     private readonly VirtualButton _jump = new VirtualButton();
     private readonly VirtualButton _toggleMoveState = new VirtualButton();
 
@@ -79,12 +85,17 @@ public class PlayerInputHandler : MonoBehaviour
     /// <summary>
     /// The input axis used to move the player character.
     /// </summary>
-    public VirtualAxis Move => _move;
+    public VirtualVector Move => _move;
 
     /// <summary>
     /// The input axis used to steer the camera.
     /// </summary>
-    public VirtualAxis Look => _look;
+    public VirtualVector Look => _look;
+
+    /// <summary>
+    /// The input axis used to control altitude in flight mode.
+    /// </summary>
+    public VirtualAxis Altitude => _altitude;
 
     /// <summary>
     /// The input button used to jump.
@@ -106,6 +117,7 @@ public class PlayerInputHandler : MonoBehaviour
         RegisterCallback("Move", Move.InputCallback);
         RegisterCallback("Look", Look.InputCallback);
         RegisterCallback("Jump", Jump.InputCallback);
+        RegisterCallback("Altitude", Altitude.InputCallback);
         RegisterCallback("ToggleMoveState", ToggleMoveState.InputCallback);
     }
 

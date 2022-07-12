@@ -33,6 +33,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Altitude",
+                    "type": "Value",
+                    "id": "a33aa4d6-f525-4b3a-b804-eafa1ac7897c",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "ToggleMoveState",
                     "type": "Button",
                     "id": "598ac978-c983-4046-9ed3-a9476744d243",
@@ -229,6 +238,72 @@
                     "action": "ToggleMoveState",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "Space/Ctrl",
+                    "id": "d2a36721-1afe-4d69-aa83-cec622633053",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Altitude",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "d3d84a21-b686-4e61-9416-451d1a2a9022",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Altitude",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "44579ae6-3124-4ba0-9c9a-33c1c1305174",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Altitude",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "A/B",
+                    "id": "1c50f2bb-4463-4efc-94ff-724b1cef83df",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Altitude",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "2117ee68-7bfc-4964-aef0-a3bd7ff4feb8",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Altitude",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "cbd73f1c-87bd-4103-8d71-b2288d94b48d",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Altitude",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         },
