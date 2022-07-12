@@ -1,0 +1,19 @@
+{
+    "name": "com.digipen.grayboxcontroller",
+    "version": "1.0.0",
+    "displayName": "Third Person Graybox Controller",
+    "description": "Prototyping package used to help test whitebox/graybox levels. Includes a third person controller.",
+    "dependencies": {
+      "com.unity.cinemachine": "2.8.6",
+      "com.unity.inputsystem": "1.3.0"
+   },
+   "keywords": [
+      "prototype",
+      "controller",
+      "whitebox",
+      "graybox"
+    ],
+    "author": {
+      "name": "Joseph Crump"
+    }
+  }
