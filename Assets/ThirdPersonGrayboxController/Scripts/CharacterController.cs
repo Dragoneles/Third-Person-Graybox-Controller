@@ -32,10 +32,6 @@ public class CharacterController : MonoBehaviour
     private float _flightSpeed = 15f;
 
     [SerializeField]
-    [Tooltip("Maximum pathing angle. Slopes steeper than this will prevent the player from moving up them.")]
-    private float _maxClimbAngle = 30f;
-
-    [SerializeField]
     private float _minCameraPitch = -80f, _maxCameraPitch = 80f;
 
     [SerializeField, Range(0f, 1f)]
